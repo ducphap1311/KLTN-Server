@@ -27,9 +27,9 @@ app.use(cors());
 app.use(xss());
 
 app.use("/api/v1", productRouter);
-app.use("/api/v2", userRouter);
-app.use("/api/v3", orderRouter);
-app.use("/api/v4", messageRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", orderRouter);
+app.use("/api/v1", messageRouter);
 app.use(notFound);
 app.use(errorHandlerFunction);
 

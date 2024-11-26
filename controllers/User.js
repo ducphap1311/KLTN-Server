@@ -18,6 +18,7 @@ const register = async (req, res) => {
         msg: "user created",
         token,
         username: user.username,
+        role: email === "hophap1311@gmail.com" ? "admin" : "user"
     });
 };
 
@@ -35,7 +36,7 @@ const login = async (req, res) => {
         throw new UnauthenticatedError("Invalid password");
     }
     const token = user.createJWT();
-    res.status(200).json({ msg: "user found", token, username: user.username });
+    res.status(200).json({ msg: "user found", token, username: user.username, role: email === "hophap1311@gmail.com" ? "admin" : "user" });
 };
 
 const dashboard = async (req, res) => {
