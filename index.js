@@ -1,3 +1,5 @@
+// index.js
+
 const express = require("express");
 require("express-async-errors");
 const app = express();
@@ -23,11 +25,14 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Thay bằng origin frontend của bạn
+    credentials: true,
+}));
 app.use(xss());
 
-app.use("/api/v1", productRouter);
-app.use("/api/v1", userRouter);
+app.use("/api/v1", productRouter); // Đảm bảo các router khác được mount đúng
+app.use("/api/v1", userRouter); // Mount userRouter tại /api/v1/user
 app.use("/api/v1", orderRouter);
 app.use("/api/v1", messageRouter);
 app.use(notFound);

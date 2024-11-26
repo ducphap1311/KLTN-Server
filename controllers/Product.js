@@ -37,40 +37,40 @@ const getSingleProduct = async (req, res) => {
     res.status(200).json({ product });
 };
 
-// const createProduct = async (req, res) => {
-//     const product = await Product.create(req.body);
-//     res.status(201).json({ product });
-// };
+const createProduct = async (req, res) => {
+    const product = await Product.create(req.body);
+    res.status(201).json({ product });
+};
 
-// const deleteProduct = async (req, res) => {
-//     const { id: productId } = req.params;
-//     const product = await Product.findOneAndDelete({ _id: productId });
-//     if (!product) {
-//         throw new NotFoundError(`No product with id ${productId}`);
-//     }
-//     res.status(201).json({ product });
-// };
+const deleteProduct = async (req, res) => {
+    const { id: productId } = req.params;
+    const product = await Product.findOneAndDelete({ _id: productId });
+    if (!product) {
+        throw new NotFoundError(`No product with id ${productId}`);
+    }
+    res.status(201).json({ product });
+};
 
-// const updateProduct = async (req, res) => {
-//     const { id: productId } = req.params;
-//     const product = await Product.findByIdAndUpdate(
-//         { _id: productId },
-//         req.body,
-//         {
-//             new: true,
-//             runValidators: true,
-//         }
-//     );
-//     if (!product) {
-//         throw new NotFoundError(`No product with id ${productId}`);
-//     }
-//     res.status(201).json({ product });
-// };
+const updateProduct = async (req, res) => {
+    const { id: productId } = req.params;
+    const product = await Product.findByIdAndUpdate(
+        { _id: productId },
+        req.body,
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+    if (!product) {
+        throw new NotFoundError(`No product with id ${productId}`);
+    }
+    res.status(201).json({ product });
+};
 
 module.exports = {
     getSingleProduct,
     getProducts,
-    // createProduct,
-    // deleteProduct,
-    // updateProduct,
+    createProduct,
+    deleteProduct,
+    updateProduct,
 };
