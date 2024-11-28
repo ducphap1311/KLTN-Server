@@ -17,28 +17,45 @@ const xss = require("xss-clean");
 const rateLimiter = require("express-rate-limit");
 
 app.set("trust proxy", 1);
+
+// Cấu hình Rate Limiting
 app.use(
     rateLimiter({
-        windowMs: 15 * 60 * 1000,
-        max: 100, 
+        windowMs: 15 * 60 * 1000, // 15 phút
+        max: 100, // Giới hạn mỗi IP tối đa 100 yêu cầu trong windowMs
+        message: "Too many requests from this IP, please try again after 15 minutes",
     })
 );
+
+// Middleware để phân tích JSON
 app.use(express.json());
+
+// Middleware bảo mật HTTP headers
 app.use(helmet());
+
+// Cấu hình CORS
 app.use(cors({
     origin: 'http://localhost:3000', // Thay bằng origin frontend của bạn
     credentials: true,
 }));
+
+// Middleware để chống XSS
 app.use(xss());
 
-app.use("/api/v1", productRouter); // Đảm bảo các router khác được mount đúng
-app.use("/api/v1", userRouter); // Mount userRouter tại /api/v1/user
+// Mount các router
+app.use("/api/v1", userRouter);
+app.use("/api/v1", productRouter);
 app.use("/api/v1", orderRouter);
 app.use("/api/v1", messageRouter);
+
+// Middleware xử lý route không tồn tại
 app.use(notFound);
+
+// Middleware xử lý lỗi
 app.use(errorHandlerFunction);
 
-const port = 5000;
+// Khởi động server
+const port = process.env.PORT || 5000;
 const start = async () => {
     try {
         await connectDB(process.env.MONGO_URI);

@@ -1,10 +1,13 @@
-const { NotFoundError } = require("../errors");
+// controllers/Product.js
+
+const { NotFoundError, BadRequestError } = require("../errors");
 const Product = require("../model/Product");
 
+// Lấy tất cả sản phẩm với phân trang, tìm kiếm và lọc
 const getProducts = async (req, res) => {
     try {
         const queryObject = {};
-        const { name, category, quality, sort } = req.query;
+        const { name, category, quality, sort, page, limit } = req.query;
 
         if (name) {
             queryObject.name = { $regex: name, $options: "i" };
@@ -15,61 +18,92 @@ const getProducts = async (req, res) => {
         if (quality) {
             queryObject.quality = quality;
         }
-        let products = Product.find(queryObject);
+
+        let result = Product.find(queryObject);
+
+        // Sort
         if (sort) {
             const sortList = sort.split(",").join(" ");
-            products = products.sort(sortList);
+            result = result.sort(sortList);
+        } else {
+            result = result.sort("-createdAt");
         }
 
-        products = await products;
-        res.status(200).json({ products, nbits: products.length });
+        // Pagination
+        const pageNumber = Number(page) || 1;
+        const limitNumber = Number(limit) || 10;
+        const skip = (pageNumber - 1) * limitNumber;
+        result = result.skip(skip).limit(limitNumber);
+
+        const products = await result;
+        const total = await Product.countDocuments(queryObject);
+
+        res.status(200).json({ products, total });
     } catch (error) {
         console.log(error);
+        throw new BadRequestError("Error fetching products");
     }
 };
 
+// Lấy một sản phẩm cụ thể
 const getSingleProduct = async (req, res) => {
     const { id: productId } = req.params;
-    const product = await Product.findOne({ _id: productId });
+    const product = await Product.findById(productId);
     if (!product) {
         throw new NotFoundError(`No product with id ${productId}`);
     }
     res.status(200).json({ product });
 };
 
+// Tạo một sản phẩm mới
 const createProduct = async (req, res) => {
+    const { sizes } = req.body;
+    if (!sizes || !Array.isArray(sizes)) {
+        throw new BadRequestError('Sizes must be provided as an array');
+    }
+
     const product = await Product.create(req.body);
     res.status(201).json({ product });
 };
 
+// Xóa một sản phẩm
 const deleteProduct = async (req, res) => {
     const { id: productId } = req.params;
-    const product = await Product.findOneAndDelete({ _id: productId });
+    const product = await Product.findByIdAndDelete(productId);
     if (!product) {
         throw new NotFoundError(`No product with id ${productId}`);
     }
-    res.status(201).json({ product });
+    res.status(200).json({ msg: "Product deleted successfully" });
 };
 
+// Cập nhật một sản phẩm
 const updateProduct = async (req, res) => {
     const { id: productId } = req.params;
+    const { sizes } = req.body;
+
+    if (sizes && !Array.isArray(sizes)) {
+        throw new BadRequestError('Sizes must be provided as an array');
+    }
+
     const product = await Product.findByIdAndUpdate(
-        { _id: productId },
+        productId,
         req.body,
         {
             new: true,
             runValidators: true,
         }
     );
+
     if (!product) {
         throw new NotFoundError(`No product with id ${productId}`);
     }
-    res.status(201).json({ product });
+
+    res.status(200).json({ product });
 };
 
 module.exports = {
-    getSingleProduct,
     getProducts,
+    getSingleProduct,
     createProduct,
     deleteProduct,
     updateProduct,

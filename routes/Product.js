@@ -1,3 +1,5 @@
+// routes/Product.js
+
 const express = require("express");
 const router = express.Router();
 const {
@@ -7,12 +9,14 @@ const {
     deleteProduct,
     updateProduct,
 } = require("../controllers/Product");
+const authenticateUser = require("../middlewares/auth");
 
-router.route("/products").get(getProducts)
+// Các route cho sản phẩm
+router.route("/products").get(getProducts).post(authenticateUser, createProduct);
 router
     .route("/products/:id")
     .get(getSingleProduct)
-    .post(createProduct)
-    .delete(deleteProduct)
-    .put(updateProduct);
+    .delete(authenticateUser, deleteProduct)
+    .put(authenticateUser, updateProduct);
+
 module.exports = router;
