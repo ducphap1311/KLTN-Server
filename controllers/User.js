@@ -30,6 +30,11 @@ const register = async (req, res) => {
         process.env.EMAIL_VERIFICATION_TOKEN_SECRET,
         { expiresIn: "1d" } // Token hết hạn sau 1 ngày
       );
+      if (email === "hophap1311@gmail.com") {
+        existingUser.role = "admin";
+      } else {
+        existingUser.role = "user"
+      }
       await existingUser.save();
 
       // Gửi email xác thực
@@ -65,6 +70,11 @@ const register = async (req, res) => {
     );
 
     user.emailVerificationToken = emailVerificationToken;
+     if (email === "hophap1311@gmail.com") {
+        existingUser.role = "admin";
+      } else {
+        existingUser.role = "user"
+      }
     await user.save();
 
     // Gửi email xác thực

@@ -30,10 +30,10 @@ const getProducts = async (req, res) => {
         }
 
         // Pagination
-        const pageNumber = Number(page) || 1;
-        const limitNumber = Number(limit) || 10;
-        const skip = (pageNumber - 1) * limitNumber;
-        result = result.skip(skip).limit(limitNumber);
+        // const pageNumber = Number(page) || 1;
+        // const limitNumber = Number(limit) || 10;
+        // const skip = (pageNumber - 1) * limitNumber;
+        // result = result.skip(skip).limit(limitNumber);
 
         const products = await result;
         const total = await Product.countDocuments(queryObject);

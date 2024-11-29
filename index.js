@@ -19,13 +19,13 @@ const rateLimiter = require("express-rate-limit");
 app.set("trust proxy", 1);
 
 // Cấu hình Rate Limiting
-app.use(
-    rateLimiter({
-        windowMs: 15 * 60 * 1000, // 15 phút
-        max: 100, // Giới hạn mỗi IP tối đa 100 yêu cầu trong windowMs
-        message: "Too many requests from this IP, please try again after 15 minutes",
-    })
-);
+// app.use(
+//     rateLimiter({
+//         windowMs: 15 * 60 * 1000, // 15 phút
+//         max: 100, // Giới hạn mỗi IP tối đa 100 yêu cầu trong windowMs
+//         message: "Too many requests from this IP, please try again after 15 minutes",
+//     })
+// );
 
 // Middleware để phân tích JSON
 app.use(express.json());
@@ -33,10 +33,23 @@ app.use(express.json());
 // Middleware bảo mật HTTP headers
 app.use(helmet());
 
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+];
+
+
 // Cấu hình CORS
 app.use(cors({
-    origin: 'http://localhost:3000', // Thay bằng origin frontend của bạn
-    credentials: true,
+    origin: function (origin, callback) {
+        // Kiểm tra nếu origin nằm trong danh sách cho phép
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, // Cho phép gửi cookie
 }));
 
 // Middleware để chống XSS
