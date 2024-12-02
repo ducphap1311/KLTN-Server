@@ -42,7 +42,7 @@ const register = async (req, res) => {
 
       const msg = {
         to: existingUser.email,
-        from: { name: "BShoes", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
+        from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
         subject: "Verify Your Email Address",
         html: `
             <h3>Hello ${existingUser.username},</h3>
@@ -82,7 +82,7 @@ const register = async (req, res) => {
 
     const msg = {
         to: existingUser.email,
-        from: { name: "BShoes", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
+        from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
         subject: "Verify Your Email Address",
         html: `
             <h3>Hello ${existingUser.username},</h3>
@@ -205,12 +205,59 @@ const sendEmail = async (req, res) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const msg = {
     to: req.body.email, // Thay bằng người nhận
-    from: { name: "BShoes", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
+    from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
     subject: "Reset password",
     html: `Reset your password <a href="http://localhost:3000/reset-password/${req.body.token}" target="_blank">here</a>`,
   };
   const info = await sgMail.send(msg);
   res.status(200).json({ info });
+};
+
+const verifyOrder = async (req, res) => {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: req.body.email, // Thay bằng người nhận
+    from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
+    subject: "Thank you for your order",
+    html: `You have ordered successfully, here is your order information <a href="http://localhost:3000/orders/${req.body.orderID}" target="_blank">here</a>`,
+  };
+  const info = await sgMail.send(msg);
+  res.status(200).json({ info });
+};
+
+const getUser = async (req, res) => {
+  const { id } = req.params;
+
+  // Lấy user theo id
+  const user = await User.findById(id).select("-password -emailVerificationToken -resetPasswordToken");
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  res.status(200).json({ user });
+};
+
+const updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { username, email, phone, city, district, ward, addressDetail } = req.body;
+
+  // Kiểm tra dữ liệu
+  if (!username || !email) {
+    throw new BadRequestError("Username and email are required");
+  }
+
+  // Cập nhật user
+  const user = await User.findByIdAndUpdate(
+    id,
+    { username, email, phone, city, district, ward, addressDetail },
+    { new: true, runValidators: true }
+  ).select("-password -emailVerificationToken -resetPasswordToken");
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  res.status(200).json({ msg: "User updated successfully", user });
 };
 
 module.exports = {
@@ -223,4 +270,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail, // Thêm controller xác thực email
+  verifyOrder,
+  getUser,
+  updateUser
 };

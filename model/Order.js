@@ -26,7 +26,23 @@ const orderSchema = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: 'User',
             required: [true, 'please provide user']
-        }
+        },
+        phone: {
+            type: String,
+            required: [true, "Please provide phone number"],
+            match: [/^(\+84|0)\d{9,10}$/, "Phone number is not valid"], // Regex for phone number validation
+        },
+        isPaid: {
+            type: Boolean,
+            default: false, // Default to false (not paid)
+            required: true, // Ensure this field is always present
+        },
+        status: {
+            type: String,
+            enum: ["Pending", "Shipping", "Delivered", "Cancelled"], // Allowed values
+            default: "Pending", // Default to "Pending"
+            required: true,
+        },
     },
     { timestamps: true }
 );

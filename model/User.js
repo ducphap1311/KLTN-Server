@@ -42,6 +42,26 @@ const userSchema = new mongoose.Schema(
             enum: ['user', 'admin'],
             default: 'user',
         },
+        // phone: {
+        //     type: String,
+        //     match: [/^(\+84|0)\d{9,10}$/, "Please provide a valid phone number"], // Regex cho số điện thoại
+        // },
+        // city: {
+        //     type: String,
+        //     maxlength: 100,
+        // },
+        // district: {
+        //     type: String,
+        //     maxlength: 100,
+        // },
+        // ward: {
+        //     type: String,
+        //     maxlength: 100,
+        // },
+        // addressDetail: {
+        //     type: String,
+        //     maxlength: 255,
+        // },
     },
     { timestamps: true }
 );

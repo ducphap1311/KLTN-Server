@@ -17,6 +17,6 @@ router
     .route("/products/:id")
     .get(getSingleProduct)
     .delete(authenticateUser, deleteProduct)
-    .put(authenticateUser, updateProduct);
+    .patch(authenticateUser, updateProduct);
 
 module.exports = router;
