@@ -79,11 +79,11 @@ const deleteProduct = async (req, res) => {
 // Cập nhật một sản phẩm
 const updateProduct = async (req, res) => {
     const { id: productId } = req.params;
-    const { sizes } = req.body;
-
-    if (sizes && !Array.isArray(sizes)) {
-        throw new BadRequestError('Sizes must be provided as an array');
-    }
+    // const { sizes } = req.body;
+    
+    // if (sizes && !Array.isArray(sizes)) {
+    //     throw new BadRequestError('Sizes must be provided as an array');
+    // }
 
     const product = await Product.findByIdAndUpdate(
         productId,

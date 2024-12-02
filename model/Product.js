@@ -16,9 +16,9 @@ const sizeSchema = new mongoose.Schema({
 
 const productSchema = new mongoose.Schema(
     {
-        images: {
-            type: [String],
-            required: [true, 'Must provide images']
+        image: {
+            type: String,
+            required: [true, 'Must provide image']
         },
         name: {
             type: String,

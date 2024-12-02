@@ -18,5 +18,6 @@ router
     .get(getSingleProduct)
     .delete(authenticateUser, deleteProduct)
     .patch(authenticateUser, updateProduct);
+    
 
 module.exports = router;
