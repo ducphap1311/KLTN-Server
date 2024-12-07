@@ -23,7 +23,13 @@ const messageSchema = new mongoose.Schema({
     message: {
         type: String,
         required: [true, 'Please provide message']
+    },
+    isReplied: {
+        type: Boolean,
+        default: false,
+        required: [true, "Please provide isReplied"]
     }
+    
 })
 
 module.exports = mongoose.model('Message', messageSchema)

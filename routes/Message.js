@@ -1,7 +1,8 @@
 const express = require('express')
-const { createMessage, getMessages } = require('../controllers/Message')
+const { createMessage, getMessages, deleteMessage, deleteAll, updateMessage } = require('../controllers/Message')
 const router = express.Router()
 
-router.route('/messages').post(createMessage).get(getMessages)
+router.route('/messages').post(createMessage).get(getMessages).delete(deleteAll)
+router.route("/messages/:id").delete(deleteMessage).patch(updateMessage)
 
 module.exports = router

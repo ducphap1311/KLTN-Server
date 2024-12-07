@@ -153,6 +153,7 @@ const login = async (req, res) => {
     token,
     username: user.username,
     role: user.role,
+    isActive: user.isActive
   });
 };
 
@@ -225,6 +226,18 @@ const verifyOrder = async (req, res) => {
   res.status(200).json({ info });
 };
 
+const replyEmail = async (req, res) => {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: req.body.email, // Thay bằng người nhận
+    from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
+    subject: "Reply your message",
+    html: `${req.body.message}`,
+  };
+  const info = await sgMail.send(msg);
+  res.status(200).json({ info });
+};
+
 const getUser = async (req, res) => {
   const { id } = req.params;
 
@@ -239,19 +252,14 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { username, email, phone, city, district, ward, addressDetail } = req.body;
-
-  // Kiểm tra dữ liệu
-  if (!username || !email) {
-    throw new BadRequestError("Username and email are required");
-  }
-
+  const props = req.body;
+  
   // Cập nhật user
   const user = await User.findByIdAndUpdate(
     id,
-    { username, email, phone, city, district, ward, addressDetail },
+    { ...props },
     { new: true, runValidators: true }
-  ).select("-password -emailVerificationToken -resetPasswordToken");
+  )
 
   if (!user) {
     throw new NotFoundError("User not found");
@@ -272,5 +280,6 @@ module.exports = {
   verifyEmail, // Thêm controller xác thực email
   verifyOrder,
   getUser,
-  updateUser
+  updateUser,
+  replyEmail
 };

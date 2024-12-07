@@ -43,6 +43,9 @@ const orderSchema = new mongoose.Schema(
             default: "Pending", // Default to "Pending"
             required: true,
         },
+        trackingCode: {
+            type: String,
+        }
     },
     { timestamps: true }
 );

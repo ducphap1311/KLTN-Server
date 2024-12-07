@@ -101,10 +101,34 @@ const updateProduct = async (req, res) => {
     res.status(200).json({ product });
 };
 
+const updateProductSizes = async (req, res) => {
+    const { productId, sizes } = req.body; // sizes = [{ size: "40", quantity: 2 }, ...]
+    try {
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        sizes.forEach(({ size, quantity }) => {
+            const sizeData = product.sizes.find((s) => s.size === size);
+            if (sizeData) {
+                sizeData.quantity -= quantity;
+            }
+        });
+
+        await product.save();
+        res.status(200).json({ message: "Product sizes updated successfully", product });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating product sizes", error });
+    }
+};
+
+
 module.exports = {
     getProducts,
     getSingleProduct,
     createProduct,
     deleteProduct,
     updateProduct,
+    updateProductSizes
 };

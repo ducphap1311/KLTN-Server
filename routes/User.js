@@ -13,7 +13,8 @@ const {
     verifyEmail,
     verifyOrder,
     getUser,
-    updateUser, // Thêm controller xác thực email
+    updateUser, 
+    replyEmail// Thêm controller xác thực email
 } = require("../controllers/User");
 const authenticateUser = require("../middlewares/auth");
 
@@ -25,9 +26,10 @@ router.route("/dashboard").get(authenticateUser, dashboard);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password").put(authenticateUser, resetPassword);
 router.route("/send-email").post(sendEmail);
+router.route("/reply-email").post(replyEmail);
 router.route("/send-order").post(verifyOrder)
 router.route("/user/:id").get(getUser)
-router.route("/user/:id").post(updateUser)
+router.route("/user/:id").patch(updateUser)
 
 // Thêm route xác thực email
 router.route("/verify-email").get(verifyEmail);

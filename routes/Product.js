@@ -8,6 +8,7 @@ const {
     createProduct,
     deleteProduct,
     updateProduct,
+    updateProductSizes
 } = require("../controllers/Product");
 const authenticateUser = require("../middlewares/auth");
 
@@ -18,6 +19,7 @@ router
     .get(getSingleProduct)
     .delete(authenticateUser, deleteProduct)
     .patch(authenticateUser, updateProduct);
+    router.route("/products/update-sizes/single").patch(updateProductSizes)
     
 
 module.exports = router;
