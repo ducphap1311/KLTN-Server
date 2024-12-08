@@ -94,7 +94,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 
 userSchema.methods.createJWT = function () {
   const token = jwt.sign(
-    { id: this._id, username: this.username, role: this.role }, // Bao gồm role trong payload
+    { id: this._id, username: this.username, role: this.role, email: this.email }, // Bao gồm role trong payload
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,

@@ -7,13 +7,13 @@ const Product = require("../model/Product");
 const getProducts = async (req, res) => {
     try {
         const queryObject = {};
-        const { name, category, quality, sort, page, limit } = req.query;
+        const { name, brand, quality, sort, page, limit } = req.query;
 
         if (name) {
             queryObject.name = { $regex: name, $options: "i" };
         }
-        if (category) {
-            queryObject.category = category;
+        if (brand) {
+            queryObject.brand = brand;
         }
         if (quality) {
             queryObject.quality = quality;

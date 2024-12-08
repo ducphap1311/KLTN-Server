@@ -35,10 +35,10 @@ const productSchema = new mongoose.Schema(
         description: {
             type: String
         },
-        category: {
+        brand: {
             type: String,
             enum: {
-                values: ['men', 'women', 'kids'],
+                values: ['MLB', 'Adidas', 'Crocs'],
                 message: '{VALUE} is not supported'
             }
         },

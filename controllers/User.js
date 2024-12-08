@@ -33,7 +33,7 @@ const register = async (req, res) => {
       if (email === "hophap1311@gmail.com") {
         existingUser.role = "admin";
       } else {
-        existingUser.role = "user"
+        existingUser.role = "user";
       }
       await existingUser.save();
 
@@ -70,27 +70,27 @@ const register = async (req, res) => {
     );
 
     user.emailVerificationToken = emailVerificationToken;
-     if (email === "hophap1311@gmail.com") {
-        existingUser.role = "admin";
-      } else {
-        existingUser.role = "user"
-      }
+    if (email === "hophap1311@gmail.com") {
+      existingUser.role = "admin";
+    } else {
+      existingUser.role = "user";
+    }
     await user.save();
 
     // Gửi email xác thực
     const verificationURL = `http://localhost:3000/verify-email/message?token=${emailVerificationToken}`;
 
     const msg = {
-        to: existingUser.email,
-        from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
-        subject: "Verify Your Email Address",
-        html: `
+      to: existingUser.email,
+      from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
+      subject: "Verify Your Email Address",
+      html: `
             <h3>Hello ${existingUser.username},</h3>
             <p>Thank you for registering an account. Please click the link below to verify your email address:</p>
         <a href="${verificationURL}">Verify Email</a>
         <p>This link will expire in 24 hours.</p>
     `,
-      };
+    };
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     await sgMail.send(msg);
@@ -153,12 +153,12 @@ const login = async (req, res) => {
     token,
     username: user.username,
     role: user.role,
-    isActive: user.isActive
+    isActive: user.isActive,
   });
 };
 
-const dashboard = async (req, res) => {
-  res.status(200).json({ msg: "success" });
+const dashboard = async (req, res) => {  
+  res.status(200).json({ msg: "success", email: req.user.email });
 };
 
 const getUsers = async (req, res) => {
@@ -242,7 +242,9 @@ const getUser = async (req, res) => {
   const { id } = req.params;
 
   // Lấy user theo id
-  const user = await User.findById(id).select("-password -emailVerificationToken -resetPasswordToken");
+  const user = await User.findById(id).select(
+    "-password -emailVerificationToken -resetPasswordToken"
+  );
   if (!user) {
     throw new NotFoundError("User not found");
   }
@@ -253,13 +255,13 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const props = req.body;
-  
+
   // Cập nhật user
   const user = await User.findByIdAndUpdate(
     id,
     { ...props },
     { new: true, runValidators: true }
-  )
+  );
 
   if (!user) {
     throw new NotFoundError("User not found");
@@ -267,6 +269,25 @@ const updateUser = async (req, res) => {
 
   res.status(200).json({ msg: "User updated successfully", user });
 };
+
+const checkUserBanned = async (req, res) => {
+  const { email } = req.body;
+  
+  // Kiểm tra email có được gửi trong body không
+  if (!email) {
+    return res.status(400).json({ error: "Email is required." });
+  }
+
+  // Tìm user theo email
+  const user = await User.findOne({email});
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  // Trả về thông tin user
+  return res.status(200).json({ user });
+}
 
 module.exports = {
   register,
@@ -281,5 +302,6 @@ module.exports = {
   verifyOrder,
   getUser,
   updateUser,
-  replyEmail
+  replyEmail,
+  checkUserBanned,
 };

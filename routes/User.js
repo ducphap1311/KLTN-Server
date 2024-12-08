@@ -14,6 +14,7 @@ const {
     verifyOrder,
     getUser,
     updateUser, 
+    checkUserBanned,
     replyEmail// Thêm controller xác thực email
 } = require("../controllers/User");
 const authenticateUser = require("../middlewares/auth");
@@ -30,6 +31,7 @@ router.route("/reply-email").post(replyEmail);
 router.route("/send-order").post(verifyOrder)
 router.route("/user/:id").get(getUser)
 router.route("/user/:id").patch(updateUser)
+router.route("/get-user").post(checkUserBanned)
 
 // Thêm route xác thực email
 router.route("/verify-email").get(verifyEmail);
