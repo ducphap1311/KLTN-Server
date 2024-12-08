@@ -40,7 +40,7 @@ const register = async (req, res) => {
       await existingUser.save();
 
       // Gửi email xác thực
-      const verificationURL = `http://localhost:3000/verify-email/message?token=${existingUser.emailVerificationToken}`;
+      const verificationURL = `https://dhsneaker.vercel.app/verify-email/message?token=${existingUser.emailVerificationToken}`;
 
       const msg = {
         to: existingUser.email,
@@ -85,7 +85,7 @@ const register = async (req, res) => {
     await user.save();
 
     // Gửi email xác thực
-    const verificationURL = `http://localhost:3000/verify-email/message?token=${emailVerificationToken}`;
+    const verificationURL = `https://dhsneaker.vercel.app/verify-email/message?token=${emailVerificationToken}`;
 
     const msg = {
       to: user.email,
@@ -215,7 +215,7 @@ const sendEmail = async (req, res) => {
     to: req.body.email, // Thay bằng người nhận
     from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
     subject: "Reset password",
-    html: `Reset your password <a href="http://localhost:3000/reset-password/${req.body.token}" target="_blank">here</a>`,
+    html: `Reset your password <a href="https://dhsneaker.vercel.app/reset-password/${req.body.token}" target="_blank">here</a>`,
   };
   const info = await sgMail.send(msg);
   res.status(200).json({ info });
@@ -227,7 +227,7 @@ const verifyOrder = async (req, res) => {
     to: req.body.email, // Thay bằng người nhận
     from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Thay bằng sender đã xác minh
     subject: "Thank you for your order",
-    html: `You have ordered successfully, here is your order information <a href="http://localhost:3000/orders/${req.body.orderID}" target="_blank">here</a>`,
+    html: `You have ordered successfully, here is your order information <a href="https://dhsneaker.vercel.app/orders/${req.body.orderID}" target="_blank">here</a>`,
   };
   const info = await sgMail.send(msg);
   res.status(200).json({ info });
