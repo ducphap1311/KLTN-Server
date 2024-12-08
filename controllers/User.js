@@ -19,6 +19,8 @@ const register = async (req, res) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
+    console.log("1");
+    
     if (existingUser.isVerified) {
       throw new BadRequestError("Email already in use");
     } else {
@@ -60,32 +62,37 @@ const register = async (req, res) => {
       });
     }
   } else {
+    console.log("2");
+    
     const user = await User.create(req.body);
-
+    console.log(user);
+    
     // Tạo token xác thực email
     const emailVerificationToken = jwt.sign(
       { userId: user._id },
       process.env.EMAIL_VERIFICATION_TOKEN_SECRET,
       { expiresIn: "1d" } // Token hết hạn sau 1 ngày
     );
+    console.log(emailVerificationToken);
 
     user.emailVerificationToken = emailVerificationToken;
     if (email === "hophap1311@gmail.com") {
-      existingUser.role = "admin";
+      user.role = "admin";
     } else {
-      existingUser.role = "user";
+      user.role = "user";
     }
+    
     await user.save();
 
     // Gửi email xác thực
     const verificationURL = `http://localhost:3000/verify-email/message?token=${emailVerificationToken}`;
 
     const msg = {
-      to: existingUser.email,
+      to: user.email,
       from: { name: "DH Sneaker", email: "hophap1311@gmail.com" }, // Ensure this email address is verified on SendGrid
       subject: "Verify Your Email Address",
       html: `
-            <h3>Hello ${existingUser.username},</h3>
+            <h3>Hello ${user.username},</h3>
             <p>Thank you for registering an account. Please click the link below to verify your email address:</p>
         <a href="${verificationURL}">Verify Email</a>
         <p>This link will expire in 24 hours.</p>
