@@ -30,6 +30,7 @@ const messageSchema = new mongoose.Schema({
         required: [true, "Please provide isReplied"]
     }
     
-})
+}, 
+  { timestamps: true })
 
 module.exports = mongoose.model('Message', messageSchema)

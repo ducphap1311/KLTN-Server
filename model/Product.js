@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema(
             required: [true, 'Must provide price']
         },
         sizes: {
-            type: [sizeSchema], // Mảng chứa kích thước và số lượng tương ứng
+            type: [sizeSchema],
             required: [true, 'Must provide sizes']
         },
         description: {

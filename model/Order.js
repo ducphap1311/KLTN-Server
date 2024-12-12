@@ -34,17 +34,17 @@ const orderSchema = new mongoose.Schema(
         phone: {
             type: String,
             required: [true, "Please provide phone number"],
-            match: [/^(\+84|0)\d{9,10}$/, "Phone number is not valid"], // Regex for phone number validation
+            match: [/^(\+84|0)\d{9,10}$/, "Phone number is not valid"], 
         },
         isPaid: {
             type: Boolean,
-            default: false, // Default to false (not paid)
-            required: true, // Ensure this field is always present
+            default: false, 
+            required: true, 
         },
         status: {
             type: String,
-            enum: ["Pending", "Shipping", "Delivered", "Cancelled"], // Allowed values
-            default: "Pending", // Default to "Pending"
+            enum: ["Pending", "Shipping", "Delivered", "Cancelled"], 
+            default: "Pending",
             required: true,
         },
         trackingCode: {

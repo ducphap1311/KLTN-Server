@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: {
       type: String,
     },
-    // Thêm các trường mới dưới đây
     isVerified: {
       type: Boolean,
       default: false,
@@ -38,7 +37,6 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     role: {
-      // Thêm trường role để phân quyền
       type: String,
       enum: ["user", "admin"],
       default: "user",
@@ -47,27 +45,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
       required: [true, "Please provide isActive"],
-    },
-    // phone: {
-    //     type: String,
-    //     match: [/^(\+84|0)\d{9,10}$/, "Please provide a valid phone number"], // Regex cho số điện thoại
-    // },
-    // city: {
-    //     type: String,
-    //     maxlength: 100,
-    // },
-    // district: {
-    //     type: String,
-    //     maxlength: 100,
-    // },
-    // ward: {
-    //     type: String,
-    //     maxlength: 100,
-    // },
-    // addressDetail: {
-    //     type: String,
-    //     maxlength: 255,
-    // },
+    }
   },
   { timestamps: true }
 );
