@@ -17,7 +17,10 @@ const xss = require("xss-clean");
 const rateLimiter = require("express-rate-limit");
 const blogRoutes = require("./routes/blogRoutes");
 const Comment = require("./model/Comment");
+const User = require("./model/User");
 const authenticateUser = require("./middlewares/auth");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 app.set("trust proxy", 1);
 
@@ -153,6 +156,159 @@ app.post('/api/v1/comments', authenticateUser, async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
+app.get("/api/v1/users/:userId/addresses", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ addresses: user.addresses });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching addresses", error: err });
+  }
+});
+
+
+app.post("/api/v1/users/:userId/addresses", async (req, res) => {
+  const { userId } = req.params;
+  const { fullName, phone, address } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    // Đảm bảo chỉ có một địa chỉ mặc định
+    const newAddress = {
+      fullName,
+      phone,
+      address,
+      isDefault: true, // Đặt địa chỉ này làm mặc định
+    };
+
+    // Nếu đã có địa chỉ mặc định, cập nhật lại isDefault = false cho tất cả các địa chỉ khác
+    if (user.addresses.length > 0) {
+      user.addresses = user.addresses.map((addr) => ({
+        ...addr,
+        isDefault: false,
+      }));
+    }
+
+    // Thêm địa chỉ mới vào danh sách
+    user.addresses.push(newAddress);
+    await user.save();
+
+    res.status(201).json({ message: "Address added successfully", address: newAddress });
+  } catch (err) {
+    res.status(500).json({ message: "Error adding address", error: err });
+  }
+});
+
+
+app.put("/api/v1/users/:userId/addresses/:addressId", async (req, res) => {
+  const { userId, addressId } = req.params;
+  const { fullName, phone, address } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    const address = user.addresses.id(addressId);
+    if (!address) return res.status(404).json({ message: "Address not found" });
+
+    address.fullName = fullName || address.fullName;
+    address.phone = phone || address.phone;
+    address.address = req.body.address || address.address;
+
+    await user.save();
+
+    res.status(200).json({ message: "Address updated successfully", address });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating address", error: err });
+  }
+});
+
+app.delete("/api/v1/users/:userId/addresses/:addressId", async (req, res) => {
+  const { userId, addressId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    const addressIndex = user.addresses.findIndex(addr => addr._id.toString() === addressId);
+    if (addressIndex === -1) return res.status(404).json({ message: "Address not found" });
+
+    const isDefault = user.addresses[addressIndex].isDefault;
+
+    // Xóa địa chỉ
+    user.addresses.splice(addressIndex, 1);
+
+    // Nếu xóa địa chỉ mặc định, cập nhật địa chỉ đầu tiên làm mặc định
+    if (isDefault && user.addresses.length > 0) {
+      user.addresses[0].isDefault = true;
+    }
+
+    await user.save();
+
+    res.status(200).json({ message: "Address deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting address", error: err });
+  }
+});
+
+app.put("/api/v1/users/:userId/addresses/:addressId/set-default", async (req, res) => {
+  const { userId, addressId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    user.addresses.forEach(addr => {
+      addr.isDefault = addr._id.toString() === addressId;
+    });
+
+    await user.save();
+
+    res.status(200).json({ message: "Default address updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error setting default address", error: err });
+  }
+});
+
+
+app.post("/api/v1/change-password", async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided." });
+  }
+
+  try {
+    // Giải mã token để lấy thông tin user
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Kiểm tra mật khẩu hiện tại
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect." });
+    }
+    // const salt = await bcrypt.genSalt(10);
+    // Mã hóa mật khẩu mới
+    // const hashedPassword = await bcrypt.hash(newPassword, salt);
+    // Cập nhật mật khẩu mới
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error.", error: err });
+  }
+});
+
 // Middleware xử lý route không tồn tại
 app.use(notFound);
 

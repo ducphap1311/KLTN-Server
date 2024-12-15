@@ -45,7 +45,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
       required: [true, "Please provide isActive"],
+    },
+    addresses: [
+    {
+      fullName: String, // Họ và tên
+      phone: String,    // Số điện thoại
+      address: String,  // Địa chỉ đầy đủ
+      isDefault: { type: Boolean, default: false } // Địa chỉ mặc định
     }
+  ],
   },
   { timestamps: true }
 );
